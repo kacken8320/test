@@ -1,0 +1,148 @@
+===========================
+Systems Programming in C
+===========================
+
+.. contents::
+   :depth: 2
+   :local:
+
+Overview
+========
+
+This document introduces low-level systems programming concepts using C.
+We focus on **memory**, **processes**, and **performance**.
+
+.. note::
+   Systems programming trades safety for control.
+   You are responsible for correctness.
+
+Memory Model
+=============
+
+C gives direct access to memory via pointers.
+
+.. important::
+   Undefined behavior is *not* a runtime error.
+   The compiler may assume it never happens.
+
+Pointers
+--------
+
+A pointer stores the address of an object.
+
+.. code-block:: c
+
+   int x = 42;
+   int *p = &x;
+
+   printf("%d\n", *p);
+
+Dereferencing ``p`` accesses the value at that address.
+
+Alignment
+---------
+
+Most architectures require aligned memory access.
+
+.. warning::
+   Misaligned access may crash or silently degrade performance.
+
+Process Model
+==============
+
+Processes are isolated execution contexts.
+
+.. sidebar:: Key idea
+
+   A process has:
+   - virtual address space
+   - file descriptors
+   - execution state
+
+Creating Processes
+------------------
+
+Processes are created with ``fork()``.
+
+.. code-block:: c
+
+   #include <unistd.h>
+
+   pid_t pid = fork();
+
+   if (pid == 0) {
+       // child
+   } else {
+       // parent
+   }
+
+The return value distinguishes parent from child.
+
+File Descriptors
+================
+
+Unix abstracts I/O using file descriptors.
+
+.. code-block:: c
+
+   int fd = open("file.txt", O_RDONLY);
+
+Standard descriptors:
+
++------+----------+
+| FD   | Meaning  |
++======+==========+
+| 0    | stdin    |
++------+----------+
+| 1    | stdout   |
++------+----------+
+| 2    | stderr   |
++------+----------+
+
+Math: Cost of a System Call
+===========================
+
+System calls are expensive compared to function calls.
+
+.. math::
+
+   T_{syscall} = T_{trap} + T_{kernel} + T_{return}
+
+Where:
+
+- :math:`T_{trap}` is the CPU mode switch
+- :math:`T_{kernel}` is kernel execution time
+
+Asymptotically:
+
+.. math::
+
+   T_{syscall} \gg T_{function}
+
+Cross References
+================
+
+We discussed memory earlier in :ref:`memory-model`.
+
+.. _memory-model:
+
+Memory Safety
+-------------
+
+Common bugs:
+
+- Buffer overflows
+- Use-after-free
+- Double free
+
+.. caution::
+   Tools like ``valgrind`` detect *symptoms*, not causes.
+
+Conclusion
+==========
+
+C is powerful but unforgiving.
+
+.. tip::
+   Write small programs.
+   Read compiler warnings.
